@@ -75,27 +75,6 @@ class ClockView
         }
     }
 
-    /*private var batteryPercent = 0
-    private var batteryCriticalPercent = 0
-    private var mainContentOffset = context.toDp(MAIN_CONTENT_OFFSET).toInt()
-
-    private lateinit var backgroundRect: Rect
-    private lateinit var batteryLevelRect: Rect
-
-    private val batteryStrokeColor: Paint by lazy {
-        Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE
-            strokeWidth = context.toDp(PAINT_BRUSH_STROKE_WIDTH)
-        }
-    }
-
-    private val batteryPercentColor: Paint by lazy {
-        Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.FILL
-            strokeWidth = context.toDp(PAINT_BRUSH_STROKE_WIDTH)
-        }
-    }*/
-
     init {
         attrs?.let { initAttrs(it, defStyleAttr, defStyleRs) }
         initClock()
@@ -167,24 +146,6 @@ class ClockView
         )
     }
 
-    /*private fun initRectangles() {
-        backgroundRect = Rect(
-            context.toDp(BATTERY_ZERO_COORDINATE).toInt(),
-            context.toDp(BATTERY_ZERO_COORDINATE).toInt(),
-            context.toDp(BATTERY_WIDTH).toInt(),
-            context.toDp(BATTERY_HEIGHT).toInt(),
-        )
-
-        batteryLevelRect = Rect(
-            backgroundRect.left + mainContentOffset,
-            backgroundRect.top + mainContentOffset,
-            ((backgroundRect.right - mainContentOffset) *
-                    (this.batteryPercent.toDouble() / 100.toDouble())).toInt(),
-            backgroundRect.bottom - mainContentOffset
-
-        )
-    }*/
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
@@ -204,9 +165,6 @@ class ClockView
         drawClockCircle(canvas)
         drawNumbers(canvas)
         drawClockArrows(canvas)
-
-        /*drawBattery(canvas)
-        drawBatteryPercent(canvas)*/
     }
 
     private fun drawClockCircle(canvas: Canvas?) {
@@ -231,8 +189,10 @@ class ClockView
             clockNumberTextColor.getTextBounds(number, 0, number.length, numberRect)
             val angle = Math.PI / 6 * (number.toInt() - 3)
             //TODO Fix magin numbers 8, 24, -60
-            val x = (clockRadius + 8 + cos(angle) * (clockRadius - 60) - numberRect.width() / 2).toFloat()
-            val y = (clockRadius + 24 + sin(angle) * (clockRadius - 60) - numberRect.width() / 2).toFloat()
+            val x =
+                (clockRadius + 8 + cos(angle) * (clockRadius - 60) - numberRect.width() / 2).toFloat()
+            val y =
+                (clockRadius + 24 + sin(angle) * (clockRadius - 60) - numberRect.width() / 2).toFloat()
             canvas?.drawText(number, x, y, clockNumberTextColor)
         }
     }
@@ -259,29 +219,16 @@ class ClockView
         )
     }
 
-    /*private fun drawBattery(canvas: Canvas?) {
-        canvas?.drawRect(backgroundRect, batteryStrokeColor)
+    fun setClockTime(hour: Int, minutes: Int, seconds: Int) {
+
+        hourValue = if (hour > 12) hour - 12 else hour
+        minuteValue = minutes
+        secondsValue = seconds
+
+        initClock()
+        requestLayout()
+        invalidate()
     }
-
-    private fun drawBatteryPercent(canvas: Canvas?) {
-
-        if (batteryPercent == 0) {
-            drawEmptyBattery(canvas)
-        } else {
-            canvas?.drawRect(batteryLevelRect, batteryPercentColor)
-        }
-    }
-
-    private fun drawEmptyBattery(canvas: Canvas?) {
-        // As I should draw fully empty battery, there is no point to convert values .toDp()
-        canvas?.drawRect(
-            0f,
-            0f,
-            0f,
-            0f,
-            batteryPercentColor
-        )
-    }*/
 
     /*fun setBatteryPercent(percent: Int) {
 
@@ -312,7 +259,7 @@ class ClockView
     override fun onRestoreInstanceState(state: Parcelable?) {
         state as SavedState
         super.onRestoreInstanceState(state.superState)
-        //setBatteryPercent(state.batteryPercent)
+        setClockTime(state.hourValue, state.minuteValue, state.secondsValue)
     }
 
     @Parcelize
