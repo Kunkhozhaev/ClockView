@@ -12,5 +12,10 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="clockViewStyle">@style/MyCustomViewStyle</item>
+    </style>
+
+    <style name="MyCustomViewStyle" parent="ClockViewStyle">
+        <item name="clockStrokeColor">@color/black</item>
     </style>
 </resources>

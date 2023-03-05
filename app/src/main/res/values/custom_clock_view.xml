@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ClockView">
+        <attr name="hourValue" format="integer" />
+        <attr name="minuteValue" format="integer" />
+        <attr name="secondsValue" format="integer" />
+        <attr name="clockRadius" format="dimension" />
+        <attr name="clockNumberTextColor" format="color" />
+        <attr name="clockStrokeColor" format="color" />
+        <attr name="clockHourArrowColor" format="color" />
+        <attr name="clockMinuteArrowColor" format="color" />
+        <attr name="clockSecondsArrowColor" format="color" />
+        <attr name="clockBackgroundColor" format="color" />
+    </declare-styleable>
+
+    <attr name="clockViewStyle" format="reference" />
+
+    <style name="ClockViewStyle">
+        <item name="clockStrokeColor">@color/black</item>
+        <item name="clockHourArrowColor">@color/black</item>
+        <item name="clockMinuteArrowColor">@color/black</item>
+        <item name="clockSecondsArrowColor">@color/orange</item>
+        <item name="clockNumberTextColor">@color/black</item>
+        <item name="clockBackgroundColor">@color/light_blue</item>
+        <item name="clockRadius">170dp</item>
+        <item name="hourValue">4</item>
+        <item name="minuteValue">47</item>
+        <item name="secondsValue">25</item>
+    </style>
+</resources>
