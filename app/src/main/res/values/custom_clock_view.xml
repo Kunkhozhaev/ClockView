@@ -7,7 +7,9 @@
         <attr name="clockRadius" format="dimension" />
         <attr name="clockNumberTextColor" format="color" />
         <attr name="clockStrokeColor" format="color" />
-        <attr name="clockArrowColor" format="color" />
+        <attr name="clockHourArrowColor" format="color" />
+        <attr name="clockMinuteArrowColor" format="color" />
+        <attr name="clockSecondsArrowColor" format="color" />
         <attr name="clockBackgroundColor" format="color" />
     </declare-styleable>
 
@@ -15,7 +17,9 @@
 
     <style name="ClockViewStyle">
         <item name="clockStrokeColor">@color/black</item>
-        <item name="clockArrowColor">@color/orange</item>
+        <item name="clockHourArrowColor">@color/black</item>
+        <item name="clockMinuteArrowColor">@color/black</item>
+        <item name="clockSecondsArrowColor">@color/orange</item>
         <item name="clockNumberTextColor">@color/black</item>
         <item name="clockBackgroundColor">@color/light_blue</item>
         <item name="clockRadius">170dp</item>

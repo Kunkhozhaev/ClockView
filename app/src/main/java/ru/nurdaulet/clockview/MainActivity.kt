@@ -17,13 +17,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         updateTime()
+
         binding.clockView.setClockRadius(170f)
     }
 
     private fun updateTime() {
         handler.post(object : Runnable {
             override fun run() {
-                // Keep the postDelayed before the updateTime(), so when the event ends, the handler will stop too.
                 handler.postDelayed(this, 1000)
 
                 val calendar = Calendar.getInstance()
