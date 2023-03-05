@@ -17,8 +17,8 @@
         <item name="clockStrokeColor">@color/black</item>
         <item name="clockArrowColor">@color/orange</item>
         <item name="clockNumberTextColor">@color/black</item>
-        <item name="clockBackgroundColor">@color/gray</item>
-        <item name="clockRadius">150dp</item>
+        <item name="clockBackgroundColor">@color/light_blue</item>
+        <item name="clockRadius">170dp</item>
         <item name="hourValue">4</item>
         <item name="minuteValue">47</item>
         <item name="secondsValue">25</item>

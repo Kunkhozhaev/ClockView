@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.os.Parcelable
 import android.util.AttributeSet
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -19,18 +18,15 @@ import kotlin.math.sin
 private const val CLOCK_DEFAULT_HOUR_VALUE = 0
 private const val CLOCK_DEFAULT_MINUTE_VALUE = 30
 private const val CLOCK_DEFAULT_SECONDS_VALUE = 45
-private const val PAINT_BRUSH_STROKE_WIDTH = 3f
-private const val MAIN_CONTENT_OFFSET = 4f
+private const val DEFAULT_STROKE_WIDTH = 3f
+private const val HOUR_ARROW_STROKE_WIDTH = 5f
+private const val MINUTE_ARROW_STROKE_WIDTH = 3f
+private const val SECOND_ARROW_STROKE_WIDTH = 1f
+private const val CLOCK_NUMERALS_STROKE_WIDTH = 1f
+private const val CLOCK_STROKE_WIDTH = 6f
 private const val CLOCK_DEFAULT_RADIUS = 60f
 private val numberList =
     mutableListOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
-
-
-private const val BATTERY_WIDTH = 200f
-private const val BATTERY_HEIGHT = 100f
-private const val BATTERY_ZERO_COORDINATE = 0f
-private const val BATTERY_WARNING_COLOR = Color.RED
-private const val BATTERY_DEFAULT_COLOR = Color.GREEN
 
 class ClockView
 @JvmOverloads constructor(
@@ -39,46 +35,51 @@ class ClockView
     defStyleAttr: Int = R.attr.clockViewStyle,
     defStyleRs: Int = R.style.ClockViewStyle
 ) : View(context, attrs, defStyleAttr, defStyleRs) {
-    private var viewHeight = 0
-    private var viewWidth = 0
+
+    enum class ClockArrowType {
+        Hour,
+        Minute,
+        Second
+    }
+
     private var hourValue = 0
     private var minuteValue = 0
     private var secondsValue = 0
     private var clockRadius = 0f
-    private var handTruncation = 0f
-    private var hourHandTruncation = 0f
+    private var arrowTruncation = 0f
+    private var minuteArrowTruncation = 0f
+    private var hourArrowTruncation = 0f
     private var fontSize = 0f
     private val numberRect = Rect()
 
     private val clockNumberTextColor: Paint by lazy {
         Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE
-            strokeWidth = context.toDp(PAINT_BRUSH_STROKE_WIDTH)
+            style = Paint.Style.FILL
+            strokeWidth = context.toDp(CLOCK_NUMERALS_STROKE_WIDTH)
         }
     }
     private val clockStrokeColor: Paint by lazy {
         Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
-            strokeWidth = context.toDp(PAINT_BRUSH_STROKE_WIDTH)
+            strokeWidth = context.toDp(CLOCK_STROKE_WIDTH)
         }
     }
     private val clockArrowColor: Paint by lazy {
         Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.STROKE
-            strokeWidth = context.toDp(PAINT_BRUSH_STROKE_WIDTH)
+            strokeWidth = context.toDp(DEFAULT_STROKE_WIDTH)
         }
     }
     private val clockBackgroundColor: Paint by lazy {
         Paint(Paint.ANTI_ALIAS_FLAG).apply {
             style = Paint.Style.FILL
-            strokeWidth = context.toDp(PAINT_BRUSH_STROKE_WIDTH)
+            strokeWidth = context.toDp(DEFAULT_STROKE_WIDTH)
         }
     }
 
     init {
         attrs?.let { initAttrs(it, defStyleAttr, defStyleRs) }
         initClock()
-        //initRectangles()
     }
 
     private fun initAttrs(attrs: AttributeSet, defStyleAttr: Int, defStyleRs: Int) {
@@ -138,8 +139,9 @@ class ClockView
         paint = Paint()
         isInit = true*/
 
-        handTruncation = clockRadius / 7
-        hourHandTruncation = clockRadius / 5
+        arrowTruncation = clockRadius / 7
+        minuteArrowTruncation = clockRadius / 7
+        hourArrowTruncation = clockRadius / 4
         fontSize = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP, 20f,
             resources.displayMetrics
@@ -188,33 +190,45 @@ class ClockView
         for (number in numberList) {
             clockNumberTextColor.getTextBounds(number, 0, number.length, numberRect)
             val angle = Math.PI / 6 * (number.toInt() - 3)
-            //TODO Fix magin numbers 8, 24, -60
+            //TODO Fix magic numbers 8, 24, -60
             val x =
-                (clockRadius + 8 + cos(angle) * (clockRadius - 60) - numberRect.width() / 2).toFloat()
+                (clockRadius + 6 + cos(angle) * (clockRadius - 60) - numberRect.width() / 2).toFloat()
             val y =
-                (clockRadius + 24 + sin(angle) * (clockRadius - 60) - numberRect.width() / 2).toFloat()
+                (clockRadius + 30 + sin(angle) * (clockRadius - 60) - numberRect.width() / 2).toFloat()
             canvas?.drawText(number, x, y, clockNumberTextColor)
         }
     }
 
     private fun drawClockArrows(canvas: Canvas?) {
-        drawArrow(canvas, (hourValue + minuteValue / 60) * 5f, true)
-        drawArrow(canvas, minuteValue.toFloat(), false)
-        drawArrow(canvas, secondsValue.toFloat(), false)
+        drawArrow(canvas, (hourValue + minuteValue / 60) * 5f, ClockArrowType.Hour)
+        drawArrow(canvas, minuteValue.toFloat(), ClockArrowType.Minute)
+        drawArrow(canvas, secondsValue.toFloat(), ClockArrowType.Second)
     }
 
-    private fun drawArrow(canvas: Canvas?, loc: Float, isHour: Boolean) {
+    private fun drawArrow(canvas: Canvas?, loc: Float, arrowType: ClockArrowType) {
         val angle = Math.PI * loc / 30 - Math.PI / 2
-        val handRadius = if (isHour) {
-            clockRadius - handTruncation - hourHandTruncation
-        } else {
-            clockRadius - handTruncation
+        var arrowRadius = 0f
+
+        when (arrowType) {
+            ClockArrowType.Hour -> {
+                arrowRadius = clockRadius - arrowTruncation - hourArrowTruncation
+                clockArrowColor.strokeWidth = context.toDp(HOUR_ARROW_STROKE_WIDTH)
+            }
+            ClockArrowType.Minute -> {
+                arrowRadius = clockRadius - arrowTruncation - minuteArrowTruncation
+                clockArrowColor.strokeWidth = context.toDp(MINUTE_ARROW_STROKE_WIDTH)
+            }
+            ClockArrowType.Second -> {
+                arrowRadius = clockRadius - arrowTruncation
+                clockArrowColor.strokeWidth = context.toDp(SECOND_ARROW_STROKE_WIDTH)
+            }
         }
+
         canvas?.drawLine(
             clockRadius,
             clockRadius,
-            (clockRadius + cos(angle) * handRadius).toFloat(),
-            (clockRadius + sin(angle) * handRadius).toFloat(),
+            (clockRadius + cos(angle) * arrowRadius).toFloat(),
+            (clockRadius + sin(angle) * arrowRadius).toFloat(),
             clockArrowColor
         )
     }
@@ -230,25 +244,17 @@ class ClockView
         invalidate()
     }
 
-    /*fun setBatteryPercent(percent: Int) {
+    fun setClockRadius(radius: Float) {
+        clockRadius = context.toDp(radius)
 
-        batteryPercent = percent.coerceIn(0, 100)
-
-        if (batteryPercent <= batteryCriticalPercent) {
-            batteryPercentColor.color = BATTERY_WARNING_COLOR
-        } else {
-            batteryPercentColor.color = BATTERY_DEFAULT_COLOR
-        }
-
-        initRectangles()
+        initClock()
         requestLayout()
         invalidate()
-    }*/
+    }
 
     private fun Context.toDp(value: Float): Float {
         return resources.displayMetrics.density * value
     }
-
 
     override fun onSaveInstanceState(): Parcelable {
         val state = super.onSaveInstanceState()
