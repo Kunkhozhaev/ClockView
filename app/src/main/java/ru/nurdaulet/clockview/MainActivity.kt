@@ -17,8 +17,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         updateTime()
-
-        binding.clockView.setClockRadius(170f)
+        // You can also set radius programmatically
+        // binding.clockView.setClockRadius(140f)
     }
 
     private fun updateTime() {

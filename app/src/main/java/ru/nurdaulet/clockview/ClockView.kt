@@ -15,20 +15,6 @@ import kotlinx.parcelize.Parcelize
 import kotlin.math.cos
 import kotlin.math.sin
 
-private const val CLOCK_DEFAULT_HOUR_VALUE = 0
-private const val CLOCK_DEFAULT_MINUTE_VALUE = 30
-private const val CLOCK_DEFAULT_SECONDS_VALUE = 45
-private const val DEFAULT_STROKE_WIDTH = 3f
-private const val HOUR_ARROW_STROKE_WIDTH = 6f
-private const val MINUTE_ARROW_STROKE_WIDTH = 3f
-private const val SECOND_ARROW_STROKE_WIDTH = 1f
-private const val CLOCK_NUMERALS_STROKE_WIDTH = 1f
-private const val CLOCK_STROKE_WIDTH = 6f
-private const val CLOCK_DEFAULT_RADIUS = 100f
-private const val NUMERAL_PADDING = 60
-private val numberList =
-    mutableListOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
-
 class ClockView
 @JvmOverloads constructor(
     context: Context,
@@ -36,12 +22,6 @@ class ClockView
     defStyleAttr: Int = R.attr.clockViewStyle,
     defStyleRs: Int = R.style.ClockViewStyle
 ) : View(context, attrs, defStyleAttr, defStyleRs) {
-
-    enum class ClockArrowType {
-        Hour,
-        Minute,
-        Second
-    }
 
     private var hourValue = 0
     private var minuteValue = 0
@@ -153,10 +133,12 @@ class ClockView
             TypedValue.COMPLEX_UNIT_SP, 20f,
             resources.displayMetrics
         )
+        //Different truncation for arrows
         arrowTruncation = clockRadius / 7
         minuteArrowTruncation = clockRadius / 7
         hourArrowTruncation = clockRadius / 3
 
+        //Different radius for each arrow
         hourArrowRadius = clockRadius - arrowTruncation - hourArrowTruncation
         minuteArrowRadius = clockRadius - arrowTruncation - minuteArrowTruncation
         secondsArrowRadius = clockRadius - arrowTruncation
@@ -203,6 +185,7 @@ class ClockView
         clockNumberTextColor.textSize = fontSize
         for (number in numberList) {
             clockNumberTextColor.getTextBounds(number, 0, number.length, numberRect)
+            // some mathematics
             val angle = Math.PI / 6 * (number.toInt() - 3)
             val x =
                 (clockRadius + cos(angle) * (clockRadius - NUMERAL_PADDING) - numberRect.width() / 2).toFloat()
@@ -225,6 +208,8 @@ class ClockView
 
         when (arrowType) {
             ClockArrowType.Hour -> {
+                // Math formulae for each angle
+                // Also considered value of minutes for hours & seconds for minutes
                 angle =
                     (Math.PI * timeMoment / 30 - Math.PI / 2 + Math.PI / 180 * minuteValue / 2).toFloat()
                 arrowRadius = hourArrowRadius
@@ -253,7 +238,6 @@ class ClockView
     }
 
     fun setClockTime(hour: Int, minutes: Int, seconds: Int) {
-
         hourValue = if (hour > 12) hour - 12 else hour
         minuteValue = minutes
         secondsValue = seconds
@@ -277,7 +261,6 @@ class ClockView
 
     override fun onSaveInstanceState(): Parcelable {
         val state = super.onSaveInstanceState()
-
         return SavedState(hourValue, minuteValue, secondsValue, state)
     }
 
@@ -294,4 +277,20 @@ class ClockView
         val secondsValue: Int,
         @IgnoredOnParcel val source: Parcelable? = null
     ) : BaseSavedState(source)
+
+    companion object {
+        private const val CLOCK_DEFAULT_HOUR_VALUE = 0
+        private const val CLOCK_DEFAULT_MINUTE_VALUE = 30
+        private const val CLOCK_DEFAULT_SECONDS_VALUE = 45
+        private const val DEFAULT_STROKE_WIDTH = 3f
+        private const val HOUR_ARROW_STROKE_WIDTH = 6f
+        private const val MINUTE_ARROW_STROKE_WIDTH = 3f
+        private const val SECOND_ARROW_STROKE_WIDTH = 1f
+        private const val CLOCK_NUMERALS_STROKE_WIDTH = 1f
+        private const val CLOCK_STROKE_WIDTH = 6f
+        private const val CLOCK_DEFAULT_RADIUS = 100f
+        private const val NUMERAL_PADDING = 60
+        private val numberList =
+            mutableListOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+    }
 }
